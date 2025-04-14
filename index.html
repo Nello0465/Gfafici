@@ -63,6 +63,16 @@
       padding: 1rem;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
+    #pulisciBtn {
+      display: block;
+      margin: 1rem auto 2rem auto;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border-radius: 0.5rem;
+      background-color: #ddd;
+      border: none;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -86,6 +96,8 @@
       <select id="calettamentoFilter" multiple></select>
     </div>
   </div>
+
+  <button id="pulisciBtn" onclick="resetFiltri()">🔄 Pulisci tutti i filtri</button>
 
   <div id="riepilogo"></div>
   <div id="grafico"></div>
@@ -134,6 +146,17 @@
 
     function getSelectedValues(select) {
       return Array.from(select.selectedOptions).map(opt => opt.value);
+    }
+
+    function resetFiltri() {
+      document.querySelectorAll('select').forEach(select => {
+        select.selectedIndex = -1;
+      });
+      aggiornaGrafico();
+    }
+
+    function formatNumber(num) {
+      return num.toLocaleString('it-IT');
     }
 
     function aggiornaGrafico() {
@@ -195,9 +218,9 @@
       Plotly.newPlot('grafico', [trace1, trace2], layout);
 
       document.getElementById('riepilogo').innerHTML = `
-        <strong>Totale articoli filtrati:</strong> ${filtrati.length} |
-        <strong>Migliori:</strong> ${migliori.length} (${pctMigliori}%) |
-        <strong>Non Migliori:</strong> ${nonMigliori.length} (${pctNonMigliori}%)
+        <strong>Totale articoli filtrati:</strong> ${formatNumber(filtrati.length)} |
+        <strong>Migliori:</strong> ${formatNumber(migliori.length)} (${pctMigliori}%) |
+        <strong>Non Migliori:</strong> ${formatNumber(nonMigliori.length)} (${pctNonMigliori}%)
       `;
     }
   </script>
