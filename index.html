@@ -11,9 +11,19 @@
       margin: 0;
       padding: 2rem;
     }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+    }
+    header img {
+      height: 60px;
+    }
     h1 {
       text-align: center;
       color: #333;
+      flex-grow: 1;
     }
     .filters {
       display: flex;
@@ -47,12 +57,18 @@
   </style>
 </head>
 <body>
-  <h1>📊 Dashboard Confronto Prezzi Fornitori</h1>
+  <header>
+    <img src="https://www.bolognagomme.eu/wp-content/uploads/2019/02/logo_bolognagomme-1.png" alt="Bologna Gomme">
+    <h1>📊 Dashboard Confronto Prezzi Fornitori</h1>
+    <img src="https://www.fintyre.it/wp-content/themes/fintyre-theme/assets/img/logo.svg" alt="Fintyre">
+  </header>
+
   <div class="filters">
     <select id="stagioneFilter" multiple></select>
     <select id="marcaFilter" multiple></select>
     <select id="calettamentoFilter" multiple></select>
   </div>
+
   <div id="riepilogo"></div>
   <div id="grafico"></div>
 
@@ -158,8 +174,8 @@
       Plotly.newPlot('grafico', [trace1, trace2], layout);
 
       document.getElementById('riepilogo').innerHTML = `
-        <strong>Totale articoli filtrati:</strong> ${filtrati.length} | 
-        <strong>Migliori:</strong> ${migliori.length} | 
+        <strong>Totale articoli filtrati:</strong> ${filtrati.length} |
+        <strong>Migliori:</strong> ${migliori.length} |
         <strong>Non Migliori:</strong> ${nonMigliori.length}
       `;
     }
