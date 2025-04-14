@@ -1,0 +1,144 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard Confronto Fornitori</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 2rem;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .filters {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+    select {
+      padding: 0.5rem;
+      font-size: 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid #ccc;
+    }
+    #grafico {
+      width: 100%;
+      max-width: 1200px;
+      margin: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>📊 Dashboard Confronto Prezzi Fornitori</h1>
+  <div class="filters">
+    <select id="stagioneFilter">
+      <option value="Tutti">Tutte le stagioni</option>
+    </select>
+    <select id="marcaFilter">
+      <option value="Tutte">Tutte le marche</option>
+    </select>
+    <select id="calettamentoFilter">
+      <option value="Tutti">Tutti i calettamenti</option>
+    </select>
+  </div>
+  <div id="grafico"></div>
+
+  <script>
+    let rawData = [];
+
+    fetch("data.json")
+      .then(res => res.json())
+      .then(data => {
+        rawData = data;
+        popolaFiltri();
+        aggiornaGrafico();
+      });
+
+    function popolaFiltri() {
+      const stagioni = [...new Set(rawData.map(r => r.Stagione))];
+      const marche = [...new Set(rawData.map(r => r.Marca))];
+      const calettamenti = [...new Set(rawData.map(r => r.Calettamento))];
+
+      stagioni.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s;
+        opt.textContent = s;
+        document.getElementById('stagioneFilter').appendChild(opt);
+      });
+
+      marche.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m;
+        opt.textContent = m;
+        document.getElementById('marcaFilter').appendChild(opt);
+      });
+
+      calettamenti.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.textContent = c;
+        document.getElementById('calettamentoFilter').appendChild(opt);
+      });
+
+      document.getElementById('stagioneFilter').addEventListener('change', aggiornaGrafico);
+      document.getElementById('marcaFilter').addEventListener('change', aggiornaGrafico);
+      document.getElementById('calettamentoFilter').addEventListener('change', aggiornaGrafico);
+    }
+
+    function aggiornaGrafico() {
+      const stagione = document.getElementById('stagioneFilter').value;
+      const marca = document.getElementById('marcaFilter').value;
+      const calettamento = document.getElementById('calettamentoFilter').value;
+
+      const filtrati = rawData.filter(r =>
+        (stagione === 'Tutti' || r.Stagione === stagione) &&
+        (marca === 'Tutte' || r.Marca === marca) &&
+        (calettamento === 'Tutti' || r.Calettamento === calettamento)
+      );
+
+      const migliori = filtrati.filter(r => r.Stato === "Migliore");
+      const nonMigliori = filtrati.filter(r => r.Stato === "Non Migliore");
+
+      const marche = [...new Set(filtrati.map(r => r.Marca))];
+
+      const x = marche;
+      const y1 = marche.map(m => migliori.filter(r => r.Marca === m).length);
+      const y2 = marche.map(m => nonMigliori.filter(r => r.Marca === m).length);
+
+      const trace1 = {
+        x: y1,
+        y: x,
+        name: 'Migliore',
+        type: 'bar',
+        orientation: 'h',
+        marker: {color: '#2ECC71'}
+      };
+
+      const trace2 = {
+        x: y2,
+        y: x,
+        name: 'Non Migliore',
+        type: 'bar',
+        orientation: 'h',
+        marker: {color: '#E74C3C'}
+      };
+
+      const layout = {
+        barmode: 'stack',
+        title: 'Articoli per Marca (Filtrati)',
+        margin: {l: 150},
+        height: 600
+      };
+
+      Plotly.newPlot('grafico', [trace1, trace2], layout);
+    }
+  </script>
+</body>
+</html>
