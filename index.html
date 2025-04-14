@@ -32,6 +32,15 @@
       margin-bottom: 2rem;
       flex-wrap: wrap;
     }
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .filter-group label {
+      margin-bottom: 0.3rem;
+      font-weight: bold;
+    }
     select {
       padding: 0.5rem;
       font-size: 1rem;
@@ -64,9 +73,18 @@
   </header>
 
   <div class="filters">
-    <select id="stagioneFilter" multiple></select>
-    <select id="marcaFilter" multiple></select>
-    <select id="calettamentoFilter" multiple></select>
+    <div class="filter-group">
+      <label for="stagioneFilter">Stagionalità</label>
+      <select id="stagioneFilter" multiple></select>
+    </div>
+    <div class="filter-group">
+      <label for="marcaFilter">Marca</label>
+      <select id="marcaFilter" multiple></select>
+    </div>
+    <div class="filter-group">
+      <label for="calettamentoFilter">Calettamento</label>
+      <select id="calettamentoFilter" multiple></select>
+    </div>
   </div>
 
   <div id="riepilogo"></div>
@@ -132,6 +150,9 @@
       const migliori = filtrati.filter(r => r.Stato === "Migliore");
       const nonMigliori = filtrati.filter(r => r.Stato === "Non Migliore");
 
+      const pctMigliori = filtrati.length ? ((migliori.length / filtrati.length) * 100).toFixed(1) : 0;
+      const pctNonMigliori = filtrati.length ? ((nonMigliori.length / filtrati.length) * 100).toFixed(1) : 0;
+
       const marche = [...new Set(filtrati.map(r => r.Marca))];
       const x = marche;
       const y1 = marche.map(m => migliori.filter(r => r.Marca === m).length);
@@ -175,8 +196,8 @@
 
       document.getElementById('riepilogo').innerHTML = `
         <strong>Totale articoli filtrati:</strong> ${filtrati.length} |
-        <strong>Migliori:</strong> ${migliori.length} |
-        <strong>Non Migliori:</strong> ${nonMigliori.length}
+        <strong>Migliori:</strong> ${migliori.length} (${pctMigliori}%) |
+        <strong>Non Migliori:</strong> ${nonMigliori.length} (${pctNonMigliori}%)
       `;
     }
   </script>
